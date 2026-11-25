@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Meus Empréstimos</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0f1412">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+
+<style>
+:root{--bg:#0f1412;--sf:#18211c;--ln:#2a382f;--tx:#eef3ee;--mu:#9fb0a4;--ac:#4ade80;--on:#0f1412;--rd:#f87171;--yl:#fbbf24;--bl:#60a5fa}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:400 16px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;padding:calc(env(safe-area-inset-top,0px) + 16px) 16px calc(env(safe-area-inset-bottom,0px) + 32px)}
+.w{max-width:560px;margin:0 auto}
+h1{font-size:22px;margin:0 0 14px}
+h2{margin:0 0 4px;font-size:20px}
+h3{margin:18px 0 8px;font-size:15px;color:var(--mu);font-weight:600}
+.sum{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:14px}
+.sum div{background:var(--sf);border:1px solid var(--ln);border-radius:10px;padding:10px}
+.sum small{display:block;color:var(--mu);font-size:12px}
+.sum b{font-size:15px}
+.btn{border:0;border-radius:10px;padding:13px;font:600 15px system-ui,sans-serif;cursor:pointer;width:100%}
+.pri{background:var(--ac);color:var(--on)}
+.sec{background:var(--sf);color:var(--tx);border:1px solid var(--ln)}
+form{background:var(--sf);border:1px solid var(--ln);border-radius:12px;padding:14px;margin:12px 0;display:none;gap:10px;flex-direction:column}
+form.open{display:flex}
+label{font-size:13px;color:var(--mu);display:flex;flex-direction:column;gap:4px;margin-bottom:8px}
+form label{margin:0}
+input,select,textarea{font-family:inherit;resize:vertical;background:var(--bg);border:1px solid var(--ln);border-radius:8px;color:var(--tx);padding:11px;font:16px system-ui,sans-serif;width:100%}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.row2{display:grid;grid-template-columns:1fr auto;gap:8px}
+.row2 .btn{width:auto;padding:11px 16px}
+.hint{font-size:12px;color:var(--mu);margin:6px 0 0}
+.fl{display:flex;gap:6px;overflow-x:auto;margin:14px 0 10px}
+.fl button{flex:none;border:1px solid var(--ln);background:transparent;color:var(--tx);border-radius:999px;padding:8px 14px;font:500 14px system-ui,sans-serif;cursor:pointer}
+.fl button[aria-pressed="true"]{background:var(--ac);color:var(--on);border-color:var(--ac)}
+.card{background:var(--sf);border:1px solid var(--ln);border-left:4px solid var(--bl);border-radius:12px;padding:14px;margin-bottom:10px}
+.card.atraso{border-left-color:var(--rd);background:#2b1b1b}.card.hoje{border-left-color:var(--yl);background:#2a2716}.card.emdia{border-left-color:var(--ac);background:#16261c}.card.pago{border-left-color:var(--mu)}
+.top{display:flex;justify-content:space-between;align-items:center;gap:8px;cursor:pointer}
+.top b{font-size:17px}
+.chip{font-size:12px;font-weight:600;padding:3px 9px;border-radius:999px;background:var(--bl);color:var(--on)}
+.atraso .chip{background:var(--rd)}.hoje .chip{background:var(--yl)}.emdia .chip{background:var(--ac)}.pago .chip{background:var(--mu)}
+.meta{color:var(--mu);font-size:14px;margin:6px 0}
+.falta{font-size:20px;font-weight:700;margin:6px 0}
+.lucro{color:var(--ac);font-weight:600}
+.late{color:var(--rd);font-size:14px;margin:4px 0}
+.bar{height:6px;background:var(--bg);border-radius:3px;margin:8px 0}
+.bar i{display:block;height:100%;background:var(--ac);border-radius:3px}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.acts .btn{padding:10px;font-size:14px}
+.wide{grid-column:1/3}
+.del{grid-column:1/3;background:transparent;color:var(--mu);border:0;font-size:13px;padding:6px}
+.empty{color:var(--mu);text-align:center;padding:28px 0}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;align-items:flex-end;z-index:5}
+.ov.open{display:flex}
+.sheet{background:var(--bg);border:1px solid var(--ln);border-radius:16px 16px 0 0;width:100%;max-width:560px;max-height:92%;overflow:auto;margin:0 auto;padding:18px 16px calc(env(safe-area-inset-bottom,0px) + 24px)}
+.big{font-size:28px;font-weight:700;color:var(--ac)}
+.prev{background:var(--bg);border:1px dashed var(--ln);border-radius:8px;padding:10px;font-size:14px;color:var(--tx)}.prev:empty{display:none}
+.hist{font-size:14px;color:var(--mu);border-top:1px solid var(--ln);padding:8px 0}
+#lock{position:fixed;inset:0;background:var(--bg);z-index:30;display:none;align-items:center;justify-content:center;padding:24px}#lock.on{display:flex}.lk{width:100%;max-width:360px}.lk h2{font-size:24px;margin:0 0 16px}body.locked .w{visibility:hidden}
+</style>
+</head>
+<body>
+<div id="lock"><div class="lk"><h2>Meus Empréstimos</h2><label>Usuário<input id="lu" autocomplete="username"></label><label>Senha<input id="lp" type="password" autocomplete="current-password"></label><button class="btn pri" id="lg">Entrar</button><button class="btn sec" id="lb" style="margin-top:8px;display:none">Entrar com a digital</button><p class="hint" id="lm"></p><button class="btn del" id="lf" style="width:100%">Esqueci a senha</button></div></div>
+<div class="w">
+<h1>Meus Empréstimos</h1>
+<div class="sum"><div><small>A receber</small><b id="s1">R$ 0,00</b></div><div><small>Recebido</small><b id="s2">R$ 0,00</b></div><div><small>Em atraso</small><b id="s3">R$ 0,00</b></div><div><small>Lucro previsto</small><b id="s4" style="color:var(--ac)">R$ 0,00</b></div></div>
+<button class="btn pri" id="nb">+ Novo empréstimo</button>
+<button class="btn pri" id="qb" style="margin-top:8px">Cobrar vencidos e de hoje</button>
+<button class="btn sec" id="authb" style="margin-top:8px">Login e segurança</button>
+<button class="btn sec" id="cfgb" style="margin-top:8px">Meu Pix e mensagem de cobrança</button>
+<form id="f">
+<label>Nome<input id="nm" required maxlength="60"></label>
+<label>WhatsApp (com DDD)<input id="ph" inputmode="tel" placeholder="65999999999"></label>
+<div class="row"><label>Valor emprestado (R$)<input id="am" type="number" step="0.01" min="1" required></label>
+<label>Parcelas<input id="np" type="number" min="1" max="60" value="1" required></label></div>
+<input type="hidden" id="jm" value="total">
+<div class="row"><label><span id="rl">Juros (%)</span><input id="rt" type="number" step="any" min="0" value="0"></label>
+<label>1º vencimento<input id="fd" type="date" required></label></div>
+<label>Multa por dia de atraso (%)<input id="dy" type="number" step="0.1" min="0" value="0"></label>
+<label>Contagem dos dias<select id="cm"><option value="c">Dias corridos (conta sábado e domingo)</option><option value="u">Só dias úteis (não conta sábado e domingo)</option></select></label>
+<label>Ou escolha pelo prazo (dias a partir de hoje)<input id="pd" type="number" min="1" placeholder="ex.: 30"></label>
+<div class="prev" id="pv"></div>
+<p class="hint">Com a multa por dia em 0, vale o padrão: 2% + juros de mora de 1% ao mês, proporcional aos dias. Se colocar uma porcentagem, ela é cobrada sobre a parcela por dia corrido de atraso. Combine tudo por escrito: multa e juros abusivos podem ser anulados na Justiça.</p>
+<button class="btn pri" type="submit">Salvar</button>
+</form>
+<div class="fl" id="fl" role="group" aria-label="Filtros"></div>
+<div id="list"></div>
+<p class="hint" style="text-align:center;margin-top:24px">Versão 3</p>
+</div>
+<div class="ov" id="ov"><div class="sheet" id="sh"></div></div>
+<script>
+var KEY="emprestimos_v1",L=[],flt="Todos",cur=-1,FS=["Todos","Em dia","A vencer","Atrasados","Pagos"];
+try{L=JSON.parse(localStorage.getItem(KEY)||"[]")}catch(e){L=[]}
+L.forEach(function(l){l.log=l.log||[]});
+function save(){try{localStorage.setItem(KEY,JSON.stringify(L))}catch(e){}}
+function $(i){return document.getElementById(i)}
+function brl(v){return "R$ "+v.toFixed(2).replace(".",",").replace(/\B(?=(\d{3})+(?!\d))/g,".")}
+function today(){var d=new Date();return new Date(d.getFullYear(),d.getMonth(),d.getDate())}
+function due(l,i){var p=l.first.split("-").map(Number);return new Date(p[0],p[1]-1+i,p[2])}
+function fd(d){return String(d.getDate()).padStart(2,"0")+"/"+String(d.getMonth()+1).padStart(2,"0")+"/"+d.getFullYear()}
+function iso(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function esc(s){var d=document.createElement("div");d.textContent=s;return d.innerHTML}
+function info(l){
+ var tot=totOf(l.amount,l.rate,l.n,l.mode),pv=tot/l.n,t=today(),paid=l.paid.filter(Boolean).length;
+ var ps=0,ex=0;l.log.forEach(function(g){if(g.t==="pag")ps+=g.v;else ex+=g.v});
+ var recv=paid*pv+ps,rem=tot+ex-recv,nx=l.paid.indexOf(false),late=0,fee=0,over=0;
+ for(var i=0;i<l.n;i++){if(l.paid[i])continue;var dd=daysBetween(due(l,i),t,l.cm==="u");
+  if(dd>0){late++;var f=l.dp>0?pv*l.dp/100*dd:pv*0.02+pv*(0.01/30)*dd;fee+=f;over+=pv+f}}
+ var st="Em dia",dl=null;
+ if(rem<=0.005){st="Pago";over=0;late=0}
+ else{over=Math.min(over,rem+fee);if(late)st="Atrasado";else if(nx>=0){var d3=Math.round((due(l,nx)-t)/864e5);if(d3<=3){st="A vencer";dl=d3}}}
+ return{dl:dl,tot:tot,ex:ex,pv:pv,paid:paid,nx:nx,st:st,late:late,fee:fee,over:over,recv:recv,rem:Math.max(rem,0)}
+}
+function render(){
+ var f=$("fl");f.innerHTML="";
+ FS.forEach(function(s){var b=document.createElement("button");b.textContent=s;b.setAttribute("aria-pressed",s===flt);b.onclick=function(){flt=s;render()};f.appendChild(b)});
+ var r=0,rc=0,ov=0,lc=0,h="";
+ L.forEach(function(l){var x=info(l);r+=x.rem;rc+=x.recv;ov+=x.over;lc+=x.tot+x.ex-l.amount});
+ L.forEach(function(l,idx){
+  var x=info(l),m={"Todos":1,"Em dia":x.st==="Em dia","A vencer":x.st==="A vencer","Atrasados":x.st==="Atrasado","Pagos":x.st==="Pago"};
+  if(!m[flt])return;
+  var cls=x.st==="Atrasado"?"atraso":x.st==="A vencer"?"hoje":x.st==="Pago"?"pago":"emdia";
+  var open=x.st!=="Pago"&&x.nx>=0;
+  var pct=Math.min(100,x.recv/(x.tot+x.ex)*100);
+  h+='<div class="card '+cls+'"><div class="top" data-a="det" data-i="'+idx+'"><b>'+esc(l.name)+'</b><span class="chip">'+(x.st==="A vencer"?(x.dl<=0?"Vence hoje":x.dl===1?"Vence amanhã":"Vence em "+x.dl+" dias"):x.st)+'</span></div>'+
+  '<div class="meta">Emprestei '+brl(l.amount)+' · Vou receber '+brl(x.tot+x.ex)+(x.ex>0?' (com juros novos)':'')+'<br><span class="lucro">Lucro previsto '+brl(x.tot+x.ex-l.amount)+'</span> · Recebido '+brl(x.recv)+'</div>'+
+  '<div class="falta">Falta '+brl(x.rem)+'</div>'+
+  (open?'<div class="meta">Próxima: parcela '+(x.nx+1)+'/'+l.n+' · vence '+fd(due(l,x.nx))+' · '+brl(x.pv)+'</div>':'')+
+  (x.late?'<div class="late">'+x.late+' parcela(s) em atraso: '+brl(x.over)+' com multa'+(l.dp>0?' de '+String(l.dp).replace('.',',')+'% por dia':' e juros')+'</div>':'')+
+  '<div class="bar"><i style="width:'+pct+'%"></i></div>'+
+  '<div class="acts">'+(open?'<button class="btn pri" data-a="pay" data-i="'+idx+'">Marcar parcela paga</button>':'<span></span>')+
+  (l.phone&&open?'<button class="btn sec" data-a="wa" data-i="'+idx+'">Cobrar no WhatsApp</button>':'<span></span>')+
+  (open?'<button class="btn sec wide" data-a="cal" data-i="'+idx+'">Lembrete no calendário (3 dias antes)</button>':'')+'<button class="btn sec wide" data-a="det" data-i="'+idx+'">Pagamento parcial, juros e editar</button>'+
+  '<button class="btn del" data-a="del" data-i="'+idx+'">Excluir</button></div></div>'
+ });
+ $("list").innerHTML=h||'<div class="empty">Nenhum empréstimo aqui ainda.</div>';
+ $("s1").textContent=brl(r);$("s2").textContent=brl(rc);$("s3").textContent=brl(ov);$("s4").textContent=brl(lc);$("qb").textContent="Cobrar vencidos e de hoje ("+qList().length+")"
+}
+function detail(i){
+ cur=i;var l=L[i],x=info(l),nxd=x.nx>=0?iso(due(l,x.nx)):"";
+ var hs=l.log.map(function(g,k){return '<div class="hist">'+g.d+' · '+(g.t==="pag"?'Pagou '+brl(g.v)+' <button class="btn sec" data-r="'+k+'" style="width:auto;padding:5px 10px;font-size:13px;margin-left:6px">Enviar recibo</button>':'Juros de '+String(g.p).replace('.',',')+'% sobre o restante (+'+brl(g.v)+')')+'</div>'}).reverse().join("");
+ $("sh").innerHTML='<h2>'+esc(l.name)+'</h2><div class="big">Falta '+brl(x.rem)+'</div><div class="meta">Emprestei '+brl(l.amount)+' · Vou receber '+brl(x.tot+x.ex)+'<br>Lucro previsto '+brl(x.tot+x.ex-l.amount)+' · Recebido '+brl(x.recv)+'</div>'+
+ '<h3>Registrar pagamento (parcial ou total)</h3><div class="row2"><input id="dv" type="number" step="0.01" min="0" placeholder="Valor pago (R$)"><button class="btn pri" id="dpay">Registrar</button></div>'+
+ '<h3>Colocar juros em cima do que falta</h3><div class="row2"><input id="dj" type="number" step="0.1" min="0" placeholder="Juros (%)"><button class="btn sec" id="djr">Aplicar</button></div><p class="hint" id="dpv">Digite a porcentagem para ver quanto fica.</p>'+
+ '<h3>Editar</h3><label>Nome<input id="en" value="'+esc(l.name).replace(/"/g,"&quot;")+'"></label><label>WhatsApp<input id="ep" inputmode="tel" value="'+esc(l.phone||"")+'"></label>'+
+ (nxd?'<label>Vencimento da próxima parcela<input id="ed" type="date" value="'+nxd+'"></label>':'')+
+ '<label>Multa por dia de atraso (%)<input id="ey" type="number" step="0.1" min="0" value="'+(l.dp||0)+'"></label><label>Contagem dos dias<select id="ec"><option value="c"'+(l.cm==="u"?"":" selected")+'>Dias corridos (conta sábado e domingo)</option><option value="u"'+(l.cm==="u"?" selected":"")+'>Só dias úteis (não conta sábado e domingo)</option></select></label><button class="btn pri" id="esv">Salvar alterações</button>'+
+ (hs?'<h3>Histórico</h3>'+hs:'')+'<button class="btn sec" id="cls" style="margin-top:18px">Fechar</button>';
+ $("ov").classList.add("open");
+ $("cls").onclick=function(){$("ov").classList.remove("open")};
+ $("sh").querySelectorAll("[data-r]").forEach(function(b){b.onclick=function(){var g=l.log[+b.dataset.r],p=(l.phone||"").replace(/\D/g,"");if(p&&p.length<=11)p="55"+p;var msg="RECIBO\n\nRecebi de "+l.name+" o valor de "+brl(g.v)+" em "+g.d+", referente ao empréstimo de "+brl(l.amount)+".\nSaldo restante: "+brl(g.rem!=null?g.rem:x.rem)+".\n\nObrigado!";window.open("https://wa.me/"+p+"?text="+encodeURIComponent(msg),"_blank","noopener")}});
+ $("dpay").onclick=function(){var v=+$("dv").value;if(!(v>0))return;l.log.push({t:"pag",v:v,d:fd(new Date()),rem:Math.max(x.rem-v,0)});save();render();detail(i)};
+ $("dj").oninput=function(){var p=+this.value;$("dpv").textContent=p>0?"Falta "+brl(x.rem)+" → passa a faltar "+brl(x.rem*(1+p/100))+" (+"+brl(x.rem*p/100)+")":"Digite a porcentagem para ver quanto fica."};
+ $("djr").onclick=function(){var p=+$("dj").value;if(!(p>0)||x.rem<=0)return;l.log.push({t:"juros",p:p,v:x.rem*p/100,d:fd(new Date())});save();render();detail(i)};
+ $("esv").onclick=function(){l.name=$("en").value.trim()||l.name;l.phone=$("ep").value;l.dp=+$("ey").value||0;l.cm=$("ec").value;
+  if(nxd&&$("ed").value){var p=$("ed").value.split("-").map(Number);l.first=iso(new Date(p[0],p[1]-1-x.nx,p[2]))}
+  save();render();$("ov").classList.remove("open")}
+}
+$("ov").onclick=function(e){if(e.target===this)this.classList.remove("open")};
+$("list").onclick=function(e){
+ var b=e.target.closest("[data-a]");if(!b)return;var i=+b.dataset.i,l=L[i],x=info(l);
+ if(b.dataset.a==="det")detail(i);
+ if(b.dataset.a==="cal"){var d=due(l,x.nx),r=new Date(d.getFullYear(),d.getMonth(),d.getDate()-3,9,0),e=new Date(r.getTime()+18e5);
+  var g=function(t){return t.getFullYear()+String(t.getMonth()+1).padStart(2,"0")+String(t.getDate()).padStart(2,"0")+"T"+String(t.getHours()).padStart(2,"0")+String(t.getMinutes()).padStart(2,"0")+"00"};
+  window.open("https://calendar.google.com/calendar/render?action=TEMPLATE&text="+encodeURIComponent("Faltam 3 dias: "+l.name+" vence dia "+fd(d)+" ("+brl(x.pv)+")")+"&dates="+g(r)+"/"+g(e)+"&details="+encodeURIComponent("Parcela "+(x.nx+1)+"/"+l.n+" de "+l.name+". Falta "+brl(x.rem)+"."),"_blank","noopener")}
+ if(b.dataset.a==="pay"){l.paid[x.nx]=true;save();render()}
+ if(b.dataset.a==="del"){if(confirm("Excluir "+l.name+"?")){L.splice(i,1);save();render()}}
+ if(b.dataset.a==="wa"){msgSheet(i);return;
+  var d=due(l,x.nx),late=daysBetween(d,today(),l.cm==="u")>0;
+  var msg="Olá, "+l.name+"! Lembrete da parcela "+(x.nx+1)+"/"+l.n+" de "+brl(x.pv)+(late?", que venceu em ":", com vencimento em ")+fd(d)+". Saldo restante: "+brl(x.rem)+". Qualquer dúvida, é só me chamar.";
+  var p=l.phone.replace(/\D/g,"");if(p.length<=11)p="55"+p;
+  window.open("https://wa.me/"+p+"?text="+encodeURIComponent(msg),"_blank","noopener")}
+};
+$("nb").onclick=function(){$("f").classList.toggle("open")};
+var DEF="Olá, {nome}! Lembrete da parcela {parcela} de {valor}, {situacao} {vencimento}. Saldo restante: {saldo}.\n\nChave Pix: {pix}";
+var CFG={pix:"",tpl:DEF};
+try{var c0=JSON.parse(localStorage.getItem("emprestimos_cfg")||"null");if(c0)CFG=c0}catch(e){}
+function saveCfg(){try{localStorage.setItem("emprestimos_cfg",JSON.stringify(CFG))}catch(e){}}
+function rep(s,k,v){return s.split("{"+k+"}").join(v)}
+function shut(){$("ov").classList.remove("open")}
+function copyTxt(t,b){var o=b.textContent;function ok(){b.textContent="Copiado!";setTimeout(function(){b.textContent=o},1500)}
+ function fb(){var a=document.createElement("textarea");a.value=t;a.style.position="fixed";a.style.opacity="0";document.body.appendChild(a);a.select();try{document.execCommand("copy");ok()}catch(e){}document.body.removeChild(a)}
+ if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(ok,fb)}else fb()}
+function fill(l,x){var d=due(l,x.nx),late=daysBetween(d,today(),l.cm==="u")>0,m=CFG.tpl;
+ m=rep(m,"nome",l.name);m=rep(m,"parcela",(x.nx+1)+"/"+l.n);m=rep(m,"valor",brl(x.pv));m=rep(m,"situacao",late?"que venceu em":"com vencimento em");m=rep(m,"vencimento",fd(d));m=rep(m,"saldo",brl(x.rem));m=rep(m,"pix",CFG.pix);
+ if(!CFG.pix)m=m.replace(/\n*Chave Pix:\s*$/i,"");return m}
+function msgSheet(i){var l=L[i],x=info(l);
+ $("sh").innerHTML=`<h2>Mensagem para ${esc(l.name)}</h2><p class="hint">Edite o texto como quiser antes de enviar.</p><label style="margin-top:10px"><textarea id="mt" rows="9"></textarea></label><div class="acts"><button class="btn pri wide" id="mw">Abrir no WhatsApp</button><button class="btn sec" id="mc">Copiar mensagem</button><button class="btn sec" id="mp">Copiar Pix</button></div><button class="btn sec" id="cls" style="margin-top:14px">Fechar</button>`;
+ $("mt").value=fill(l,x);$("ov").classList.add("open");
+ $("cls").onclick=shut;
+ $("mc").onclick=function(){copyTxt($("mt").value,this)};
+ $("mp").onclick=function(){if(!CFG.pix){cfgSheet();return}copyTxt(CFG.pix,this)};
+ $("mw").onclick=function(){var p=(l.phone||"").replace(/\D/g,"");if(p&&p.length<=11)p="55"+p;window.open("https://wa.me/"+p+"?text="+encodeURIComponent($("mt").value),"_blank","noopener")}}
+function cfgSheet(){
+ $("sh").innerHTML=`<h2>Meu Pix e mensagem</h2><h3>Minha chave Pix</h3><div class="row2"><input id="cp" placeholder="CPF, telefone, e-mail ou chave aleatória"><button class="btn sec" id="cpc">Copiar</button></div><h3>Mensagem padrão de cobrança</h3><textarea id="ct" rows="8"></textarea><p class="hint">O app troca estes campos pelos dados de cada pessoa: {nome} {parcela} {valor} {situacao} {vencimento} {saldo} {pix}. Você pode escrever o texto do seu jeito.</p><div class="acts"><button class="btn pri" id="csv">Salvar</button><button class="btn sec" id="crs">Voltar ao padrão</button></div><h3>Backup dos dados</h3><div class="acts"><button class="btn sec" id="bk">Copiar backup</button><button class="btn sec" id="rs">Restaurar</button></div><textarea id="bt" rows="3" placeholder="Cole aqui o backup para restaurar" style="margin-top:8px"></textarea><p class="hint">Copie o backup e cole numa conversa com você mesmo no WhatsApp ou nas notas. Se perder os dados, cole aqui e toque em Restaurar.</p><button class="btn sec" id="cls" style="margin-top:14px">Fechar</button>`;
+ $("cp").value=CFG.pix;$("ct").value=CFG.tpl;wireAuth();$("ov").classList.add("open");
+ $("cls").onclick=shut;
+ $("cpc").onclick=function(){if($("cp").value)copyTxt($("cp").value,this)};
+ $("crs").onclick=function(){$("ct").value=DEF};
+ $("bk").onclick=function(){copyTxt(JSON.stringify({v:1,L:L,CFG:CFG}),this)};
+ $("rs").onclick=function(){try{var o=JSON.parse($("bt").value);if(!o||!Array.isArray(o.L))throw 0;if(!confirm("Isso substitui os dados atuais. Continuar?"))return;L=o.L;L.forEach(function(l){l.log=l.log||[]});if(o.CFG)CFG=o.CFG;save();saveCfg();render();shut()}catch(e){alert("Backup inválido. Cole o texto completo.")}};
+ $("csv").onclick=function(){CFG.pix=$("cp").value.trim();CFG.tpl=$("ct").value||DEF;saveCfg();shut()}}
+$("cfgb").onclick=cfgSheet;
+function qList(){var q=[];L.forEach(function(l,i){var x=info(l);if(x.rem>0&&x.nx>=0&&l.phone&&(x.st==="Atrasado"||(x.st==="A vencer"&&x.dl<=0)))q.push(i)});return q}
+function queue(k,q){q=q||qList();$("ov").classList.add("open");
+ if(!q.length||k>=q.length){$("sh").innerHTML=`<h2>${q.length?"Pronto!":"Ninguém pra cobrar agora"}</h2><p class="meta">${q.length?"Você passou por todos da lista.":"Não há parcelas atrasadas nem vencendo hoje."}</p><button class="btn sec" id="cls">Fechar</button>`;$("cls").onclick=shut;return}
+ var i=q[k],l=L[i],x=info(l);
+ $("sh").innerHTML=`<h3 style="margin-top:0">${k+1} de ${q.length}</h3><h2>${esc(l.name)}</h2><div class="meta">${x.st==="Atrasado"?"Atrasado":"Vence hoje"} · Falta ${brl(x.rem)}</div><label style="margin-top:10px"><textarea id="mt" rows="8"></textarea></label><div class="acts"><button class="btn pri wide" id="mw">Abrir no WhatsApp</button><button class="btn sec" id="mn">Próximo</button><button class="btn sec" id="cls">Fechar</button></div><p class="hint">Envie no WhatsApp, volte aqui e toque em Próximo.</p>`;
+ $("mt").value=fill(l,x);
+ $("cls").onclick=shut;
+ $("mn").onclick=function(){queue(k+1,q)};
+ $("mw").onclick=function(){var p=(l.phone||"").replace(/\D/g,"");if(p&&p.length<=11)p="55"+p;window.open("https://wa.me/"+p+"?text="+encodeURIComponent($("mt").value),"_blank","noopener")}}
+$("qb").onclick=function(){queue(0)};
+function preview(){var a=+$("am").value,n=+$("np").value,r=+$("rt").value||0,t=totOf(a,r,n,$("jm").value),el=$("pv");
+ if(!(a>0&&n>0)){el.textContent="";return}
+ var pv=t/n,h="Emprestando "+brl(a)+", você recebe "+brl(t)+" e lucra "+brl(t-a)+"<br>"+n+"x de "+brl(pv);
+ var f=$("fd").value;if(f&&n<=12){var p=f.split("-").map(Number);for(var i=0;i<n;i++)h+="<br>"+(i+1)+"ª: "+fd(new Date(p[0],p[1]-1+i,p[2]))+" · "+brl(pv)}
+ el.innerHTML=h}
+["am","np","rt","fd","jm"].forEach(function(k){$(k).addEventListener("input",preview);$(k).addEventListener("change",preview)});
+function addDays(d,n,u){var r=new Date(d);if(!u){r.setDate(r.getDate()+n);return r}var c=0;while(c<n){r.setDate(r.getDate()+1);var w=r.getDay();if(w!==0&&w!==6)c++}return r}
+function daysBetween(a,b,u){if(!u)return Math.floor((b-a)/864e5);var c=0,d=new Date(a);while(d<b){d.setDate(d.getDate()+1);var w=d.getDay();if(w!==0&&w!==6)c++}return c}
+function fromPrazo(){var n=+$("pd").value;if(n>0){$("fd").value=iso(addDays(today(),n,$("cm").value==="u"));preview()}}
+$("pd").addEventListener("input",fromPrazo);
+function totOf(a,r,n,m){return m==="total"?a*(1+r/100):m==="fixo"?a+r:m==="receber"?r:a*(1+r/100*n)}
+function rlabel(){var m=$("jm").value;$("rl").textContent=m==="fixo"?"Valor dos juros (R$)":m==="receber"?"Total que vou receber (R$)":"Juros (%)"}
+$("jm").addEventListener("change",rlabel);$("cm").addEventListener("change",fromPrazo);
+$("f").onsubmit=function(e){e.preventDefault();var n=+$("np").value;
+ L.unshift({name:$("nm").value.trim(),phone:$("ph").value,amount:+$("am").value,n:n,rate:+$("rt").value||0,mode:$("jm").value,cm:$("cm").value,dp:+$("dy").value||0,first:$("fd").value,paid:new Array(n).fill(false),log:[]});
+ save();this.reset();rlabel();$("np").value=1;$("rt").value=0;$("dy").value=0;this.classList.remove("open");render()};
+render();
+var AK="emprestimos_auth",A=null,hid=0,fails=0,until=0;
+try{A=JSON.parse(localStorage.getItem(AK)||"null")}catch(e){A=null}
+var canBio=!!(window.PublicKeyCredential&&navigator.credentials&&window.crypto&&crypto.subtle);
+function saveAuth(){try{localStorage.setItem(AK,JSON.stringify(A))}catch(e){}}
+function hex(a){return Array.from(new Uint8Array(a)).map(function(x){return x.toString(16).padStart(2,"0")}).join("")}
+function randHex(n){var a=new Uint8Array(n);crypto.getRandomValues(a);return hex(a)}
+async function hashPw(p,s){var k=await crypto.subtle.importKey("raw",new TextEncoder().encode(p),"PBKDF2",false,["deriveBits"]);var b=await crypto.subtle.deriveBits({name:"PBKDF2",salt:new TextEncoder().encode(s),iterations:100000,hash:"SHA-256"},k,256);return hex(b)}
+function b2s(b){return btoa(String.fromCharCode.apply(null,new Uint8Array(b)))}
+function s2b(s){return Uint8Array.from(atob(s),function(c){return c.charCodeAt(0)})}
+function lock(){if(!A)return;document.body.classList.add("locked");$("lock").classList.add("on");$("ov").classList.remove("open");$("lb").style.display=(A.bio&&canBio)?"block":"none";$("lp").value="";$("lm").textContent=""}
+function unlock(){document.body.classList.remove("locked");$("lock").classList.remove("on")}
+async function tryLogin(){
+ if(Date.now()<until){$("lm").textContent="Aguarde alguns segundos e tente de novo.";return}
+ var ok=$("lu").value.trim()===A.u&&(await hashPw($("lp").value,A.salt))===A.h;
+ if(ok){fails=0;unlock()}else{fails++;if(fails>=5){until=Date.now()+30000;fails=0;$("lm").textContent="Muitas tentativas. Aguarde 30 segundos."}else{$("lm").textContent="Usuário ou senha incorretos."}}
+}
+async function bioUnlock(){
+ try{await navigator.credentials.get({publicKey:{challenge:crypto.getRandomValues(new Uint8Array(32)),allowCredentials:[{type:"public-key",id:s2b(A.bio)}],userVerification:"required",timeout:60000}});unlock()}
+ catch(e){$("lm").textContent="Digital não reconhecida. Use usuário e senha."}
+}
+async function enableBio(){
+ try{var c=await navigator.credentials.create({publicKey:{challenge:crypto.getRandomValues(new Uint8Array(32)),rp:{name:"Meus Empréstimos"},user:{id:crypto.getRandomValues(new Uint8Array(16)),name:A.u,displayName:A.u},pubKeyCredParams:[{type:"public-key",alg:-7},{type:"public-key",alg:-257}],authenticatorSelection:{authenticatorAttachment:"platform",userVerification:"required"},timeout:60000}});A.bio=b2s(c.rawId);saveAuth();authSheet()}
+ catch(e){alert("Não foi possível ativar a digital. Confira se o celular tem digital ou bloqueio de tela cadastrado.")}
+}
+function authHtml(){
+ if(!A)return '<h3>Login do app</h3><label>Usuário<input id="su" autocomplete="off"></label><label>Senha<input id="sp" type="password" autocomplete="new-password"></label><button class="btn pri" id="sc">Criar login</button><p class="hint">Guarde a senha. Se esquecer, só dá pra entrar apagando os dados e restaurando pelo backup.</p>';
+ return '<h3>Login do app</h3><p class="meta">Login ativo · usuário: '+esc(A.u)+(A.bio?' · digital ativada':'')+'</p>'+((canBio&&!A.bio)?'<button class="btn sec" id="sb" style="margin-bottom:8px">Ativar digital</button>':'')+'<button class="btn sec" id="sr">Remover login</button>'
+}
+function wireAuth(){
+ var sc=$("sc");if(sc)sc.onclick=async function(){var u=$("su").value.trim(),p=$("sp").value;if(!u||p.length<4){alert("Coloque um usuário e uma senha de pelo menos 4 caracteres.");return}var s=randHex(16);A={u:u,salt:s,h:await hashPw(p,s),bio:null};saveAuth();cfgSheet()};
+ var sb=$("sb");if(sb)sb.onclick=enableBio;
+ var sr=$("sr");if(sr)sr.onclick=async function(){var p=prompt("Digite sua senha para remover o login:");if(p===null)return;if((await hashPw(p,A.salt))===A.h){A=null;try{localStorage.removeItem(AK)}catch(e){}cfgSheet()}else alert("Senha incorreta.")}
+}
+async function chk(p){return (await hashPw(p,A.salt))===A.h}
+function authSheet(){
+ var h='<h2>Login e segurança</h2>';
+ if(!A){
+  h+='<p class="meta">Crie um usuário e uma senha para proteger o app.</p><label>Usuário<input id="a1" autocomplete="off"></label><label>Senha (mínimo 4)<input id="a2" type="password" autocomplete="new-password"></label><label>Repita a senha<input id="a3" type="password" autocomplete="new-password"></label><button class="btn pri" id="ac">Criar login</button>';
+ }else{
+  h+='<p class="meta">Login ativo · usuário: <b>'+esc(A.u)+'</b>'+(A.bio?' · digital ativada':'')+'</p>'+
+  '<h3>Trocar nome de usuário</h3><label>Novo usuário<input id="b1" autocomplete="off"></label><label>Senha atual<input id="b2" type="password"></label><button class="btn sec" id="bu">Salvar novo usuário</button>'+
+  '<h3>Trocar senha</h3><label>Senha atual<input id="c1" type="password"></label><label>Nova senha (mínimo 4)<input id="c2" type="password"></label><label>Repita a nova senha<input id="c3" type="password"></label><button class="btn sec" id="cs">Salvar nova senha</button>'+
+  '<h3>Digital (biometria)</h3>'+(!canBio?'<p class="hint">Este aparelho ou navegador não permite digital.</p>':A.bio?'<button class="btn sec" id="d0">Desativar digital</button>':'<button class="btn pri" id="d1">Ativar digital</button><p class="hint">Vai pedir sua digital (ou o bloqueio de tela do celular) para confirmar.</p>')+
+  '<h3>Remover login</h3><label>Senha atual<input id="e1" type="password"></label><button class="btn sec" id="er">Remover login</button>';
+ }
+ h+='<button class="btn sec" id="cls" style="margin-top:18px">Fechar</button>';
+ $("sh").innerHTML=h;$("ov").classList.add("open");$("cls").onclick=shut;
+ if(!A){$("ac").onclick=async function(){var u=$("a1").value.trim(),p=$("a2").value;if(!u||p.length<4)return alert("Coloque um usuário e uma senha de pelo menos 4 caracteres.");if(p!==$("a3").value)return alert("As senhas não são iguais.");var s=randHex(16);A={u:u,salt:s,h:await hashPw(p,s),bio:null};saveAuth();alert("Login criado!");authSheet()};return}
+ $("bu").onclick=async function(){var u=$("b1").value.trim();if(!u)return alert("Digite o novo usuário.");if(!(await chk($("b2").value)))return alert("Senha atual incorreta.");A.u=u;saveAuth();alert("Usuário alterado!");authSheet()};
+ $("cs").onclick=async function(){if(!(await chk($("c1").value)))return alert("Senha atual incorreta.");var p=$("c2").value;if(p.length<4)return alert("A nova senha precisa ter pelo menos 4 caracteres.");if(p!==$("c3").value)return alert("As senhas novas não são iguais.");var s=randHex(16);A.salt=s;A.h=await hashPw(p,s);saveAuth();alert("Senha alterada!");authSheet()};
+ if($("d1"))$("d1").onclick=function(){enableBio()};
+ if($("d0"))$("d0").onclick=function(){A.bio=null;saveAuth();authSheet()};
+ $("er").onclick=async function(){if(!(await chk($("e1").value)))return alert("Senha atual incorreta.");A=null;try{localStorage.removeItem(AK)}catch(e){}alert("Login removido.");authSheet()}
+}
+$("authb").onclick=authSheet;
+$("lg").onclick=tryLogin;
+$("lp").addEventListener("keydown",function(e){if(e.key==="Enter")tryLogin()});
+$("lb").onclick=bioUnlock;
+$("lf").onclick=function(){if(confirm("Isso apaga TODOS os dados deste app e o login. Você poderá restaurar pelo backup. Continuar?")){try{localStorage.removeItem(KEY);localStorage.removeItem("emprestimos_cfg");localStorage.removeItem(AK)}catch(e){}location.reload()}};
+document.addEventListener("visibilitychange",function(){if(document.hidden)hid=Date.now();else if(A&&hid&&Date.now()-hid>60000)lock()});
+if(A){lock();if(A.bio&&canBio)setTimeout(bioUnlock,300)}
+</script>
+<script>if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){})})}</script>
+</body>
+</html>
